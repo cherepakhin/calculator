@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Калькулятор</title>
+  <link th:href="@{/css/bootstrap-superhero.min.css}" rel="stylesheet"/>
+  <link th:href="@{/css/sticky-footer-navbar.css}" rel="stylesheet"/>
+  <!--  <link th:href="@{/webjars/bootstrap/4.1.1/css/bootstrap.min.css}"-->
+  <!--        rel="stylesheet"-->
+  <!--        media="screen"/>-->
+
+  <script th:src="@{/webjars/jquery/3.3.1-1/jquery.min.js}"></script>
+  <script th:src="@{/webjars/popper.js/1.14.1/umd/popper.min.js}"></script>
+  <script th:src="@{/webjars/bootstrap/4.1.1/js/bootstrap.min.js}"></script>
+</head>
+<body>
+<div th:replace="layout :: header"></div>
+<main class="container py-3">
+  <h1>Калькулятор аннуитетного кредита</h1>
+  <form th:action="@{/}" th:object="${calculatorDTO}" method="post">
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label" for="monthsLabel">Кол-во
+        месяцев</label>
+      <div class="col-sm-10">
+      <input type="number" class="form-control" id="monthsLabel"
+             th:field="*{months}"
+             aria-describedby="descrMonths"
+             th:classappend="${not #lists.isEmpty(#fields.errors('months'))} ? is-invalid"
+             required
+      >
+      <small id="descrMonths" class="form-text invalid-feedback"
+             th:if="${#fields.hasErrors('months')}" th:errors="*{months}"
+      ></small>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label" for="labelCredit">Сумма
+        кредита</label>
+      <div class="col-sm-10">
+        <input type="number" class="form-control" id="labelCredit"
+               th:field="*{credit}"
+               aria-describedby="descrCredit"
+        >
+        <small id="descrCredit" class="form-text invalid-feedback"
+               th:if="${#fields.hasErrors('credit')}" th:errors="*{credit}"
+        ></small>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary my-2"
+            value="Submit">Расчитать
+    </button>
+  </form>
+  <h5
+      th:text="'Процентная ставка '+${#numbers.formatDecimal(calculator.percent*100,1, 'DEFAULT', 2, 'DEFAULT')}+'%'"></h5>
+
+  <h5 class="py-4">Платежи</h5>
+  <table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+      <th scope="col">Год</th>
+      <th scope="col">Месяц</th>
+      <th scope="col">Платеж по основному долгу</th>
+      <th scope="col">Платеж по процентам</th>
+      <th scope="col">Остаток основного долга</th>
+      <th scope="col">Общая сумма платежа</th>
+    </tr>
+    </thead>
+    <tbody class="text-right">
+    <tr data-th-each="payment : ${calculator.payments}">
+      <th scope="row" data-th-text="${#temporals.year(payment.date)}"></th>
+      <td data-th-text="${#temporals.month(payment.date)}"></td>
+      <td data-th-text="${payment.payDebt}"></td>
+      <td data-th-text="${payment.payPercent}"></td>
+      <td data-th-text="${payment.sumLastDebtCredit}"></td>
+      <td data-th-text="${payment.payDebt+payment.payPercent}"></td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+<div th:replace="layout :: footer"></div>
+</body>
+</html>
